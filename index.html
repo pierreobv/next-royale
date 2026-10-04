@@ -1,0 +1,355 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NEXT Royale · the party game of NEXT: Valletta</title>
+<meta name="description" content="NEXT Royale is the party game of NEXT: Valletta. Sixteen rounds across Valletta, free in your browser. Online with up to 7 friends, or on your own every day.">
+<meta property="og:title" content="NEXT Royale">
+<meta property="og:description" content="The party game of NEXT: Valletta. Free, in your browser.">
+<meta property="og:image" content="https://pierreobv.github.io/next-royale/img/og.jpg">
+<meta property="og:url" content="https://pierreobv.github.io/next-royale/">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#242426">
+<link rel="icon" href="img/favicon.png">
+<link rel="apple-touch-icon" href="img/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --charcoal: #242426;
+  --ink: #1b1b1d;
+  --panel: #2e2e31;
+  --line: #3a3a3e;
+  --gold: #FFCF33;
+  --gold-dim: #e6b92c;
+  --white: #ffffff;
+  --grey: #b8b8bc;
+  --soft: #8d8d93;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  background: var(--charcoal);
+  color: var(--white);
+  font-family: Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size: 17px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+a { color: var(--gold); }
+.wrap { max-width: 1120px; margin: 0 auto; padding: 0 24px; }
+header.top { padding: 22px 0; }
+header.top .wrap { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+header.top img { height: 30px; width: auto; display: block; }
+header.top nav a { color: var(--grey); text-decoration: none; font-weight: 600; font-size: 15px; margin-left: 22px; }
+header.top nav a:hover { color: var(--white); }
+
+.hero { padding: 36px 0 56px; }
+.hero .wrap { display: grid; grid-template-columns: 1fr 1.1fr; gap: 48px; align-items: center; }
+.kicker { color: var(--gold); font-weight: 700; letter-spacing: .08em; text-transform: uppercase; font-size: 14px; margin: 0 0 10px; }
+h1 { font-size: 76px; line-height: .95; margin: 0 0 18px; font-weight: 800; letter-spacing: -.02em; color: var(--gold); }
+.lede { font-size: 20px; color: var(--white); margin: 0 0 28px; max-width: 34ch; }
+.btn {
+  display: inline-flex; align-items: center; gap: 12px;
+  background: var(--gold); color: var(--charcoal);
+  font-weight: 800; font-size: 19px; text-decoration: none;
+  padding: 16px 26px; border-radius: 12px; border: 0; cursor: pointer;
+  box-shadow: 0 8px 28px rgba(255, 207, 51, .18);
+}
+.btn:hover { background: #ffd84f; }
+.btn svg { width: 22px; height: 22px; }
+.btn.ghost { background: transparent; color: var(--white); border: 1px solid var(--line); box-shadow: none; font-weight: 700; font-size: 16px; padding: 12px 18px; }
+.btn.ghost:hover { border-color: var(--gold); color: var(--gold); }
+.meta { color: var(--soft); font-size: 14px; margin: 14px 0 0; }
+.meta a { color: var(--grey); }
+.alt { margin-top: 10px; font-size: 15px; color: var(--grey); }
+.shot { border-radius: 16px; overflow: hidden; box-shadow: 0 30px 80px rgba(0, 0, 0, .45); border: 1px solid #3a3a3e; background: #000; aspect-ratio: 16 / 9; }
+.shot img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+.phone { display: none; background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 20px; margin: 0 0 8px; max-width: 460px; }
+.phone h3 { margin: 0 0 6px; font-size: 19px; }
+.phone p { margin: 0 0 14px; color: var(--grey); font-size: 16px; }
+.phone .row { display: flex; gap: 10px; flex-wrap: wrap; }
+body.is-phone .phone { display: block; }
+body.is-phone .desk-only { display: none; }
+
+section { padding: 56px 0; border-top: 1px solid #303034; }
+h2 { font-size: 38px; line-height: 1.1; margin: 0 0 10px; font-weight: 800; letter-spacing: -.01em; }
+.sub { color: var(--grey); margin: 0 0 28px; max-width: 62ch; }
+
+.new { background: linear-gradient(135deg, rgba(255,207,51,.12), rgba(255,207,51,.03)); border: 1px solid rgba(255,207,51,.35); border-radius: 16px; padding: 22px 24px; }
+.new strong { color: var(--gold); }
+
+.tabs { display: inline-flex; background: var(--ink); border-radius: 12px; padding: 4px; margin: 0 0 22px; border: 1px solid var(--line); }
+.tabs button { background: none; border: 0; color: var(--grey); font: inherit; font-weight: 700; font-size: 15px; padding: 9px 18px; border-radius: 9px; cursor: pointer; }
+.tabs button[aria-selected="true"] { background: var(--gold); color: var(--charcoal); }
+.steps { display: none; counter-reset: s; list-style: none; padding: 0; margin: 0; max-width: 760px; }
+.steps.on { display: block; }
+.steps li { position: relative; padding: 0 0 18px 52px; }
+.steps li::before {
+  counter-increment: s; content: counter(s);
+  position: absolute; left: 0; top: -2px; width: 34px; height: 34px; border-radius: 50%;
+  background: var(--panel); border: 1px solid var(--line); color: var(--gold);
+  font-weight: 800; display: flex; align-items: center; justify-content: center; font-size: 16px;
+}
+.steps b { color: var(--white); }
+.steps .note { display: block; color: var(--grey); font-size: 15px; margin-top: 4px; }
+.why { color: var(--grey); font-size: 15px; margin: 18px 0 0; max-width: 760px; }
+kbd, .ui { font-family: inherit; font-weight: 700; color: var(--gold); white-space: nowrap; }
+
+.grid2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; }
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 20px 22px; }
+.card h3 { margin: 0 0 6px; font-size: 19px; }
+.card p { margin: 0; color: var(--grey); font-size: 16px; }
+
+.place { margin: 0 0 30px; }
+.place h3 { color: var(--gold); font-size: 14px; letter-spacing: .08em; text-transform: uppercase; margin: 0 0 12px; }
+.rounds { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.round { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 16px 18px; }
+.round h4 { margin: 0 0 2px; font-size: 17px; }
+.round .kind { color: var(--gold); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; }
+.round p { margin: 6px 0 0; color: var(--grey); font-size: 15px; line-height: 1.45; }
+
+.gallery { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+.gallery img { width: 100%; height: auto; aspect-ratio: 16 / 9; object-fit: cover; border-radius: 12px; border: 1px solid var(--line); display: block; background: var(--panel); }
+
+details { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 0 20px; margin: 0 0 10px; max-width: 860px; }
+summary { cursor: pointer; font-weight: 700; padding: 16px 0; list-style: none; }
+summary::-webkit-details-marker { display: none; }
+summary::after { content: "+"; float: right; color: var(--gold); font-weight: 800; }
+details[open] summary::after { content: "\2212"; }
+details p { margin: 0 0 16px; color: var(--grey); }
+
+footer { padding: 40px 0 56px; border-top: 1px solid #303034; color: var(--soft); font-size: 14px; }
+footer .wrap { display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap; }
+footer img { height: 24px; width: auto; display: block; }
+
+.toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); background: var(--gold); color: var(--charcoal); font-weight: 700; padding: 10px 18px; border-radius: 10px; opacity: 0; transition: opacity .2s; pointer-events: none; }
+.toast.show { opacity: 1; }
+
+.big { font-size: 21px; padding: 18px 34px; }
+.cta-row { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+ol.plain { padding-left: 20px; margin: 0; color: var(--grey); }
+ol.plain li { margin: 0 0 6px; }
+@media (max-width: 900px) {
+  .hero .wrap { grid-template-columns: 1fr; gap: 28px; }
+  h1 { font-size: 54px; }
+  .rounds { grid-template-columns: repeat(2, 1fr); }
+  .gallery { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 600px) {
+  .wrap { padding: 0 16px; }
+  header.top nav { display: none; }
+  h1 { font-size: 44px; }
+  h2 { font-size: 30px; }
+  .lede { font-size: 18px; }
+  .grid2, .rounds, .gallery { grid-template-columns: 1fr; }
+  .btn { width: 100%; justify-content: center; }
+  .tabs { display: flex; }
+  .tabs button { flex: 1; }
+}
+</style>
+<script>
+// an invite link to this page (?room=KQMT) goes straight into the game, ready to join
+(function () {
+  var m = /[?&]room=([A-Za-z]{4})\b/.exec(location.search);
+  if (m) location.replace("play/?room=" + m[1].toUpperCase());
+}());
+</script>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <img src="img/next-logo.png" alt="NEXT.io" width="125" height="30">
+    <nav>
+      <a href="#online">Play online</a>
+      <a href="#alone">Play alone</a>
+      <a href="#rounds">Rounds</a>
+      <a href="#faq">FAQ</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+<div class="hero">
+  <div class="wrap">
+    <div>
+      <p class="kicker">The party game of NEXT: Valletta</p>
+      <h1>NEXT<br>Royale</h1>
+      <p class="lede">Sixteen rounds across Valletta, from the MCC to a rave cave, the Grand Harbour and a rooftop at sunrise. Free, in your browser. Bring up to 7 friends online, or play the daily show on your own.</p>
+
+      <div class="phone" id="phone">
+        <h3>NEXT Royale runs on a laptop or desktop</h3>
+        <p>It needs a keyboard, so it doesn't play on a phone or tablet yet. Send yourself the link and open it on your computer.</p>
+        <div class="row">
+          <a class="btn" id="mail-me" href="#">Email me the link</a>
+          <button class="btn ghost" id="copy-link" type="button">Copy link</button>
+        </div>
+      </div>
+
+      <div class="desk-only">
+        <div class="cta-row">
+          <a class="btn big" id="play" href="play/">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13a1 1 0 0 0 1.5.86l10.5-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5z"/></svg>
+            <span>Play now</span>
+          </a>
+        </div>
+        <p class="alt">Nothing to install and no account. Best in Chrome or Edge on a laptop or desktop.</p>
+      </div>
+      <p class="meta" id="meta">Version 0.9.0 · M9 Play Anywhere</p>
+    </div>
+    <div class="shot"><img src="img/hero.jpg" alt="Rooftop Fall Ball at sunset over Valletta, gold against blue" width="1600" height="900"></div>
+  </div>
+</div>
+
+<section>
+  <div class="wrap">
+    <div class="new">
+      <strong>New in 0.9.0, play anywhere.</strong> NEXT Royale now runs in your browser, and online games go through our game server: create a game, send a 4-letter code or a link, or pick a live game from the list. No router settings and nothing to install. Everything from Play alone is here too: the daily show, Festival Week, time trials and the looks you earn.
+    </div>
+  </div>
+</section>
+
+<section id="online">
+  <div class="wrap">
+    <h2>Play together</h2>
+    <p class="sub">Up to 8 players from anywhere, and bots fill the field up to 16 beans. One of you creates the game and runs the show.</p>
+    <div class="grid2">
+      <div class="card">
+        <h3>Create a game</h3>
+        <p>Choose <span class="ui">Play online with friends</span>, then <span class="ui">Create a game</span>. You get a room code like KQMT, and <span class="ui">Copy invite link</span> gives you a link that drops your friends straight into it.</p>
+      </div>
+      <div class="card">
+        <h3>Join a game</h3>
+        <p>Open the invite link, pick the game under <span class="ui">Live games</span>, or type the 4-letter code. Then wait in the lobby for the show to start.</p>
+      </div>
+      <div class="card">
+        <h3>Talk while you play</h3>
+        <p>Press <kbd>T</kbd> to chat, hold <kbd>V</kbd> to talk (the browser asks for your microphone the first time). Hold <kbd>Q</kbd> for the LinkedIn emotes, and press <kbd>P</kbd> for photo mode.</p>
+      </div>
+      <div class="card">
+        <h3>Good to know</h3>
+        <p>The first game after a quiet spell can take up to a minute to connect while the game server wakes up. After that it's quick. Everyone plays the same version, so refresh the page if a game says yours is different.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="alone">
+  <div class="wrap">
+    <h2>Play alone</h2>
+    <p class="sub">Something to play every day on your own, against the bots. Everything you unlock, you unlock by playing: there's no shop.</p>
+    <div class="grid2">
+      <div class="card">
+        <h3>The daily show</h3>
+        <p>One show a day, the same for everyone, and one go at it. You get a card at the end to post, with your streak on it.</p>
+      </div>
+      <div class="card">
+        <h3>Festival Week</h3>
+        <p>The festival week of NEXT: Valletta, Monday 24 to Thursday 27 May, as four chapters. Thursday ends at the rooftop pool, and you have to win it.</p>
+      </div>
+      <div class="card">
+        <h3>Time trials</h3>
+        <p>The six races on your own, against a ghost of your best run. Bronze, silver and gold for each.</p>
+      </div>
+      <div class="card">
+        <h3>Your look</h3>
+        <p>Lanyards, the tote bag, booth socks, the espresso martini hat and more. Other players see what you're wearing online.</p>
+      </div>
+    </div>
+  </div>
+</section>
+<section id="rounds">
+  <div class="wrap">
+    <h2>The rounds</h2>
+    <p class="sub">A show is five random rounds and one winner. Or pick any round from the menu and play it on its own.</p>
+
+    <div class="place">
+      <h3>More Valletta</h3>
+      <div class="rounds">
+        <div class="round"><span class="kind">Race · Rave Cave</span><h4>Gate Crash</h4><p>Doors that open on the beat, seesaws over a pit, and a dance floor where the DJ calls the colours. The bouncer is watching.</p></div>
+        <div class="round"><span class="kind">Survival · Rave Cave</span><h4>Bass Drop</h4><p>Stay on the spinning drum. Every drop opens more holes.</p></div>
+        <div class="round"><span class="kind">Race · Grand Harbour</span><h4>Harbour Jetties</h4><p>Crane drops, a container climb, rope swings and lanes of boats, out to the boat party.</p></div>
+        <div class="round"><span class="kind">Teams · Grand Harbour</span><h4>Luzzu Hoarders</h4><p>Keep the giant inflatable cans in your boat and steal theirs. The emptiest boat goes home.</p></div>
+        <div class="round"><span class="kind">Teams · The Rooftop</span><h4>Rooftop Fall Ball</h4><p>Football with giant beach balls at sunset. Todd is on the decks.</p></div>
+        <div class="round"><span class="kind">Final · The Rooftop Pool</span><h4>Sink or Swim</h4><p>Floats that sink once you step on them, three pools deep. The last bean on a float wins.</p></div>
+      </div>
+    </div>
+
+    <div class="place">
+      <h3>The MCC</h3>
+      <div class="rounds">
+        <div class="round"><span class="kind">Race</span><h4>Badge Rush</h4><p>The longest badge queue in Malta, with obstacles.</p></div>
+        <div class="round"><span class="kind">Race</span><h4>Coffee Queue</h4><p>Fake flagstones, and a coffee cart that won't wait for you.</p></div>
+        <div class="round"><span class="kind">Red light, green light</span><h4>The Keynote</h4><p>Move while the speaker talks, freeze when he turns. The floor is freshly polished.</p></div>
+        <div class="round"><span class="kind">Climb</span><h4>Ice Bath</h4><p>Up the scaffold to the hot tub before the ice water catches you. Near the top it's one board wide.</p></div>
+        <div class="round"><span class="kind">Memory</span><h4>Slot Match</h4><p>Remember the symbols and stand on the right one when the floor goes.</p></div>
+        <div class="round"><span class="kind">Tag</span><h4>VIP Pass</h4><p>Grab a pass off someone's back and hang on to it.</p></div>
+        <div class="round"><span class="kind">Dodgeball</span><h4>Team Building</h4><p>Gold against blue. The losing team goes home.</p></div>
+        <div class="round"><span class="kind">Survival</span><h4>Cash Out</h4><p>The crash game, on a rising lift. Jump off to bank before it crashes.</p></div>
+        <div class="round"><span class="kind">Final</span><h4>The Hot Seat</h4><p>Jump the sweeping bars on the Republic Hall stage. Last bean standing wins.</p></div>
+        <div class="round"><span class="kind">Final</span><h4>Take Your Seats</h4><p>Musical chairs, with Todd on the decks.</p></div>
+      </div>
+    </div>
+
+    <div class="gallery">
+      <img src="img/shot-rave.jpg" alt="The dance floor in Gate Crash, in the Rave Cave" loading="lazy" width="1600" height="900">
+      <img src="img/shot-harbour.jpg" alt="Beans crossing the boat lanes in Harbour Jetties" loading="lazy" width="1600" height="900">
+      <img src="img/shot-pool.jpg" alt="Sink or Swim on the rooftop pools at sunrise" loading="lazy" width="1600" height="900">
+    </div>
+  </div>
+</section>
+
+<section id="faq">
+  <div class="wrap">
+    <h2>FAQ</h2>
+    <details><summary>Is it free?</summary><p>Yes, completely. There's nothing to buy and no account to make.</p></details>
+    <details><summary>Which computers does it run on?</summary><p>Any laptop or desktop from the last few years, with a keyboard and a mouse or trackpad. It's made for Chrome and Edge: Safari and Firefox may work, but Chrome is where it's tested. The first visit loads about 22 MB; after that it opens quickly. If a laptop struggles, the game lowers its graphics by itself. Phones and tablets aren't supported yet.</p></details>
+    <details><summary>Do I need to sign up for anything?</summary><p>No. You type your name and pick a colour the first time you play. Your name, your Festival Week progress, your daily show streak and your looks are kept in this browser on this computer. Another browser or computer starts fresh, and so does a private window.</p></details>
+    <details><summary>What does the game send over the internet?</summary><p>When you play online, your bean's moves, your chat and your voice (only while you hold V) go to the other players in your game, through the NEXT.io game server. Nothing else. The server passes it on and doesn't keep it.</p></details>
+    <details><summary>How do I look around?</summary><p>Click inside the game and it takes the mouse: moving it turns the camera. Esc gives you the cursor back and pauses (online, the show carries on).</p></details>
+    <details><summary>Where do my photos and posts go?</summary><p>Photo mode pictures, the post cards and your daily show cards download to your Downloads folder.</p></details>
+    <details><summary>The controls?</summary><p>WASD or the arrow keys to move, Space to jump, Shift to dive, E to grab. A controller works too. F1 opens the settings.</p></details>
+    <details><summary>Is there an app?</summary><p>Yes, the same game for Mac and Windows, for anyone who'd rather install it. It plays online with the browser version. Ask the NEXT.io team for it.</p></details>
+    <details><summary>Something's broken.</summary><p>Tell us at NEXT: Valletta, or message the NEXT.io team. A screenshot helps a lot :)</p></details>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <img src="img/next-logo.png" alt="NEXT.io" width="100" height="24">
+    <span>Made by the NEXT.io team for NEXT: Valletta, 26-27 May 2027.</span>
+  </div>
+</footer>
+
+<div class="toast" id="toast">Link copied</div>
+
+<script>
+function isPhone() {
+  var ua = navigator.userAgent || "";
+  var touchMac = /Macintosh/.test(ua) && navigator.maxTouchPoints > 1;
+  return /iPhone|iPad|iPod|Android|Mobile/i.test(ua) || touchMac;
+}
+if (isPhone()) document.body.classList.add("is-phone");
+var here = location.href.split("#")[0].split("?")[0];
+document.getElementById("mail-me").href = "mailto:?subject=" + encodeURIComponent("NEXT Royale") +
+  "&body=" + encodeURIComponent("Play NEXT Royale on your laptop: " + here);
+document.getElementById("copy-link").addEventListener("click", function () {
+  var done = function () {
+    var t = document.getElementById("toast");
+    t.classList.add("show");
+    setTimeout(function () { t.classList.remove("show"); }, 1600);
+  };
+  if (navigator.clipboard) navigator.clipboard.writeText(here).then(done, done); else done();
+});
+fetch("version.json", { cache: "no-store" }).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
+  if (d && d.version) document.getElementById("meta").textContent = "Version " + d.version + " · " + d.name;
+}).catch(function () {});
+</script>
+</body>
+</html>
