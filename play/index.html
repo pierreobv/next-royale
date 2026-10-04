@@ -76,6 +76,90 @@ const NR_PARTS = {"index.pck": {"parts": ["index.pck.gz.0", "index.pck.gz.1"], "
   };
 }());
 </script>
+<script>
+/* M9: browsers stop drawing a page that's hidden (another tab in front, or the window minimised or
+   covered), and the game stops with it. On your own that's a pause, which is fine. Online, the host's
+   copy runs the show for everyone and answers anyone joining, so while a connection to the game server
+   is open, a hidden page keeps going about 30 times a second, ticked by a small worker. */
+(function () {
+  const realRaf = window.requestAnimationFrame && window.requestAnimationFrame.bind(window);
+  if (!realRaf || typeof Worker === 'undefined' || typeof document.hidden === 'undefined') return;
+  const sockets = new Set();
+  const RealWS = window.WebSocket;
+  if (RealWS) {
+    const Tracked = function (url, protocols) {
+      const ws = (protocols === undefined) ? new RealWS(url) : new RealWS(url, protocols);
+      sockets.add(ws);
+      ws.addEventListener('close', function () { sockets.delete(ws); });
+      return ws;
+    };
+    Tracked.prototype = RealWS.prototype;
+    ['CONNECTING', 'OPEN', 'CLOSING', 'CLOSED'].forEach(function (k) { Tracked[k] = RealWS[k]; });
+    window.WebSocket = Tracked;
+  }
+  function online() {
+    for (const ws of sockets) if (ws.readyState === 1) return true;
+    return false;
+  }
+  let worker = null;
+  let waiting = [];
+  let lastEnd = -1e9;
+  let nextId = 1;
+  const jobs = new Map();
+  function run(job, t) {
+    if (job.done) return;
+    job.done = true;
+    jobs.delete(job.id);
+    job.cb(t);
+  }
+  function viaRaf(job) {
+    job.raf = true;
+    realRaf(function (t) { run(job, t); });
+  }
+  function startWorker() {
+    if (worker !== null) return !!worker;
+    try {
+      const src = 'setInterval(function () { postMessage(0); }, 33);';
+      worker = new Worker(URL.createObjectURL(new Blob([src], { type: 'text/javascript' })));
+      worker.onmessage = function () {
+        // and leave the browser a moment between frames, however long a frame takes
+        if (!waiting.length || performance.now() - lastEnd < 12) return;
+        const due = waiting; waiting = [];
+        const t = performance.now();
+        for (const job of due) {
+          try { run(job, t); } catch (e) { setTimeout(function () { throw e; }); }
+        }
+        lastEnd = performance.now();
+      };
+    } catch (e) { worker = false; }
+    return !!worker;
+  }
+  window.requestAnimationFrame = function (cb) {
+    const job = { id: nextId++, cb: cb, done: false, raf: false };
+    jobs.set(job.id, job);
+    if (document.hidden && online() && startWorker()) waiting.push(job);
+    else viaRaf(job);
+    return job.id;
+  };
+  const realCancel = window.cancelAnimationFrame && window.cancelAnimationFrame.bind(window);
+  window.cancelAnimationFrame = function (id) {
+    const job = jobs.get(id);
+    if (job) { job.done = true; jobs.delete(id); }
+    else if (realCancel) realCancel(id);
+  };
+  document.addEventListener('visibilitychange', function () {
+    if (document.hidden) {
+      if (online() && startWorker()) {
+        // frames asked for while the page was showing won't come now: hand them to the worker
+        for (const job of jobs.values()) if (!job.done && job.raf) { job.raf = false; waiting.push(job); }
+      }
+    } else if (waiting.length) {
+      const due = waiting; waiting = [];
+      for (const job of due) viaRaf(job);
+    }
+  });
+}());
+</script>
 <script src="index.js"></script>
 <script>
 const GODOT_CONFIG = {"args":[],"canvasResizePolicy":2,"emscriptenPoolSize":8,"ensureCrossOriginIsolationHeaders":true,"executable":"index","experimentalVK":false,"fileSizes":{"index.pck":12919248,"index.wasm":39509339},"focusCanvas":true,"gdextensionLibs":[],"godotPoolSize":4};
@@ -108,7 +192,7 @@ const engine = new Engine(GODOT_CONFIG);
       load.remove();
     }, function (err) {
       console.error(err);
-      fail('NEXT Royale could not start in this browser.\n' + (err && err.message ? err.message : String(err)) + '\nChrome, Edge or Safari on a laptop or desktop works best.');
+      fail('NEXT Royale could not start in this browser.\n' + (err && err.message ? err.message : String(err)) + '\nChrome or Edge on a laptop or desktop works best.');
     });
   }
   const missing = Engine.getMissingFeatures({ threads: GODOT_THREADS_ENABLED });
