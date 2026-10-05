@@ -44,7 +44,7 @@ body { background: var(--char); color: var(--ink); overflow: hidden; touch-actio
 /* M9: the game can be served as gzipped parts (GitHub's web upload takes files up to 25 MB, and
    GitHub Pages may not compress .wasm). The build writes the list below; the loader reassembles the
    parts and unzips them in the browser, so the engine sees the usual index.wasm and index.pck. */
-const NR_PARTS = {"index.pck": {"parts": ["index.pck.gz.0", "index.pck.gz.1"], "gz": true}, "index.wasm": {"parts": ["index.wasm.gz.0", "index.wasm.gz.1"], "gz": true}};
+const NR_PARTS = {"index.pck": {"parts": ["index.pck.gz.0", "index.pck.gz.1"], "gz": true, "v": "6fe927187f6a"}, "index.wasm": {"parts": ["index.wasm.gz.0", "index.wasm.gz.1"], "gz": true, "v": "e2b4f6085f97"}};
 (function () {
   if (!Object.keys(NR_PARTS).length) return;
   const origFetch = window.fetch.bind(window);
@@ -57,7 +57,9 @@ const NR_PARTS = {"index.pck": {"parts": ["index.pck.gz.0", "index.pck.gz.1"], "
       async start(controller) {
         try {
           for (const p of spec.parts) {
-            const r = await origFetch(p, { credentials: 'same-origin', cache: 'default' });
+            // M9.1: the content's fingerprint on the address: a new version is never mixed with
+            // parts the browser kept from an older one
+            const r = await origFetch(spec.v ? p + '?v=' + spec.v : p, { credentials: 'same-origin', cache: 'default' });
             if (!r.ok) throw new Error('Could not load ' + p + ' (' + r.status + ')');
             const reader = r.body.getReader();
             for (;;) {
@@ -159,10 +161,15 @@ const NR_PARTS = {"index.pck": {"parts": ["index.pck.gz.0", "index.pck.gz.1"], "
     }
   });
 }());
+/* M9.1: closing or reloading the tab in the middle of an online game asks first (when the host's tab
+   goes, the show ends for everyone). The game sets window.__nrInGame while it's in one. */
+window.addEventListener('beforeunload', function (e) {
+  if (window.__nrInGame) { e.preventDefault(); e.returnValue = ''; return ''; }
+});
 </script>
 <script src="index.js"></script>
 <script>
-const GODOT_CONFIG = {"args":[],"canvasResizePolicy":2,"emscriptenPoolSize":8,"ensureCrossOriginIsolationHeaders":true,"executable":"index","experimentalVK":false,"fileSizes":{"index.pck":12919248,"index.wasm":39509339},"focusCanvas":true,"gdextensionLibs":[],"godotPoolSize":4};
+const GODOT_CONFIG = {"args":[],"canvasResizePolicy":2,"emscriptenPoolSize":8,"ensureCrossOriginIsolationHeaders":true,"executable":"index","experimentalVK":false,"fileSizes":{"index.pck":12942768,"index.wasm":39509339},"focusCanvas":true,"gdextensionLibs":[],"godotPoolSize":4};
 const GODOT_THREADS_ENABLED = false;
 const engine = new Engine(GODOT_CONFIG);
 (function () {
